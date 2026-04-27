@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import SearchBar from './components/SearchBar'
 import SearchResults from './components/SearchResults'
 import TextViewer from './components/TextViewer'
 import DailyPanel from './components/DailyPanel'
+import { useLang } from './LangContext'
 import './App.css'
 
 export default function App() {
+  const { lang, setLang, t, isHe } = useLang()
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState(null)
   const [selectedRef, setSelectedRef] = useState(null)
@@ -59,14 +61,20 @@ export default function App() {
         <div className="header-inner">
           <div className="logo">
             <span className="logo-he">ספריא</span>
-            <span className="logo-en">Sefaria Explorer</span>
+            <span className="logo-en">{t.appSubtitle}</span>
           </div>
-          <DailyPanel />
+          <div className="header-right">
+            <div className="lang-toggle">
+              <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
+              <button className={lang === 'he' ? 'active' : ''} onClick={() => setLang('he')}>עב</button>
+            </div>
+            <DailyPanel />
+          </div>
         </div>
       </header>
 
       <main className="app-main">
-        <SearchBar onSearch={handleSearch} loading={loading} />
+        <SearchBar onSearch={handleSearch} loading={loading} placeholder={t.searchPlaceholder} searchLabel={t.search} />
 
         {error && <div className="error-msg">{error}</div>}
 
@@ -89,8 +97,8 @@ export default function App() {
           {!searchResults && !selectedRef && !loading && (
             <div className="empty-state">
               <div className="empty-icon">📖</div>
-              <h2>Explore Jewish Texts</h2>
-              <p>Search across Torah, Talmud, Mishnah, Midrash and thousands of commentaries</p>
+              <h2>{t.exploreTitle}</h2>
+              <p>{t.exploreSubtitle}</p>
               <div className="suggestions">
                 {['Genesis 1:1', 'Shabbat 31a', 'Avot 1:1', 'love', 'שלום'].map(s => (
                   <button key={s} className="suggestion-chip" onClick={() => { setQuery(s); handleSearch(s) }}>

@@ -17,10 +17,12 @@
   gap: 12px;
 }
 
-.results-header {
+.results-toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .results-count {
@@ -30,35 +32,189 @@
   padding: 4px 10px;
   background: var(--bg2);
   border-radius: 99px;
+  white-space: nowrap;
+}
+
+.results-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Collapse all button */
+.collapse-btn {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.collapse-btn:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* MultiSelect */
+.ms-root {
+  position: relative;
+}
+
+.ms-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.ms-root.ms-active .ms-trigger {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ms-trigger:hover {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ms-caret {
+  font-size: 9px;
+  opacity: 0.6;
+}
+
+.ms-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  inset-inline-start: 0;
+  min-width: 160px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 100;
+  padding: 6px 0;
+}
+
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.ms-option:hover {
+  background: var(--accent-light);
+}
+
+.ms-option input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
 }
 
 .results-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
+}
+
+.result-group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.result-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg2);
+  border: none;
+  cursor: pointer;
+  text-align: start;
+  gap: 12px;
+  transition: background 0.15s;
+}
+
+.result-group-header:hover {
+  background: var(--accent-light);
+}
+
+.result-group-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.title-primary {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.title-paren {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.result-group-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.result-group-items {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
 }
 
 .result-card {
   display: block;
   width: 100%;
-  text-align: left;
+  text-align: start;
   background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 12px 16px;
   cursor: pointer;
-  transition: all 0.15s;
-  box-shadow: var(--shadow);
+  transition: background 0.15s;
+}
+
+.result-card:last-child {
+  border-bottom: none;
 }
 
 .result-card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 20px rgba(74,124,89,0.15);
-  transform: translateY(-1px);
-}
-
-.result-card:active {
-  transform: translateY(0);
+  background: var(--accent-light);
 }
 
 .result-card-top {

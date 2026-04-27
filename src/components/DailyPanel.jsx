@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useLang } from '../LangContext'
 import './DailyPanel.css'
 
 function parseContent(data) {
@@ -12,6 +13,7 @@ function parseContent(data) {
 }
 
 export default function DailyPanel() {
+  const { t } = useLang()
   const [open, setOpen] = useState(false)
   const [calendars, setCalendars] = useState(null)
   const [parsha, setParsha] = useState(null)
@@ -41,7 +43,7 @@ export default function DailyPanel() {
   return (
     <div className="daily-panel">
       <button className="daily-btn" onClick={load}>
-        📅 Today's Learning {open ? '▲' : '▼'}
+        📅 {t.todaysLearning} {open ? '▲' : '▼'}
       </button>
 
       {open && (
@@ -52,10 +54,14 @@ export default function DailyPanel() {
             <>
               {parsha && (
                 <div className="daily-section">
-                  <div className="daily-label">Parsha</div>
-                  <div className="daily-value">
-                    {parsha.parasha || parsha.parsha || parsha.name || parsha.raw || JSON.stringify(parsha)}
-                  </div>
+                  <div className="daily-label">{t.parashatHashavua}</div>
+                  <div className="daily-value">{parsha.displayValue?.en}</div>
+                  {parsha.displayValue?.he && (
+                    <div className="daily-value-he hebrew">{parsha.displayValue.he}</div>
+                  )}
+                  {parsha.description?.en && (
+                    <div className="daily-desc">{parsha.description.en}</div>
+                  )}
                 </div>
               )}
 
@@ -71,7 +77,7 @@ export default function DailyPanel() {
 
               {calItems.length === 0 && !parsha && (
                 <div className="daily-section">
-                  <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No calendar data available.</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>{t.noCalendar}</p>
                 </div>
               )}
             </>

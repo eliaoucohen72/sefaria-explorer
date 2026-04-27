@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { useLang } from '../LangContext'
 import './SearchBar.css'
 
-export default function SearchBar({ onSearch, loading }) {
+export default function SearchBar({ onSearch, loading, placeholder, searchLabel }) {
+  const { isHe } = useLang()
   const [value, setValue] = useState('')
 
   function handleSubmit(e) {
@@ -18,11 +20,12 @@ export default function SearchBar({ onSearch, loading }) {
           type="text"
           value={value}
           onChange={e => setValue(e.target.value)}
-          placeholder="Search texts, references, topics… (e.g. Genesis 1:1, Shabbat, אהבה)"
+          placeholder={placeholder || 'Search texts, references, topics…'}
+          dir={isHe ? 'rtl' : 'ltr'}
           autoFocus
         />
         <button className="search-btn" type="submit" disabled={loading || !value.trim()}>
-          {loading ? <span className="spinner" /> : 'Search'}
+          {loading ? <span className="spinner" /> : (searchLabel || 'Search')}
         </button>
       </div>
     </form>

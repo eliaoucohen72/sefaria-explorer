@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLang } from '../LangContext'
 import './TextViewer.css'
 
 function parseContent(data) {
@@ -25,6 +26,7 @@ function flattenVerses(val) {
 }
 
 export default function TextViewer({ ref_, textData, linksData, loading, onBack, onSelectRef }) {
+  const { t } = useLang()
   const [activeTab, setActiveTab] = useState('text')
   const [showHe, setShowHe] = useState(true)
   const [showEn, setShowEn] = useState(true)
@@ -43,7 +45,7 @@ export default function TextViewer({ ref_, textData, linksData, loading, onBack,
     <div className="text-viewer">
       <div className="tv-header">
         <button className="back-btn" onClick={onBack}>
-          ← Back to results
+          {t.backToResults}
         </button>
         <div className="tv-title">
           <h1>{ref_}</h1>
@@ -60,7 +62,7 @@ export default function TextViewer({ ref_, textData, linksData, loading, onBack,
       {loading && (
         <div className="tv-loading">
           <div className="tv-spinner" />
-          <span>Loading text…</span>
+          <span>{t.loading}</span>
         </div>
       )}
 
@@ -68,10 +70,10 @@ export default function TextViewer({ ref_, textData, linksData, loading, onBack,
         <>
           <div className="tv-tabs">
             <button className={`tv-tab ${activeTab === 'text' ? 'active' : ''}`} onClick={() => setActiveTab('text')}>
-              Text {maxVerses > 0 && <span className="tab-count">{maxVerses}</span>}
+              {t.text} {maxVerses > 0 && <span className="tab-count">{maxVerses}</span>}
             </button>
             <button className={`tv-tab ${activeTab === 'links' ? 'active' : ''}`} onClick={() => setActiveTab('links')}>
-              Commentaries & Links {linksList.length > 0 && <span className="tab-count">{linksList.length}</span>}
+              {t.commentariesLinks} {linksList.length > 0 && <span className="tab-count">{linksList.length}</span>}
             </button>
           </div>
 
@@ -80,11 +82,11 @@ export default function TextViewer({ ref_, textData, linksData, loading, onBack,
               <div className="tv-controls">
                 <label className="toggle-label">
                   <input type="checkbox" checked={showHe} onChange={e => setShowHe(e.target.checked)} />
-                  <span>Hebrew</span>
+                  <span>{t.hebrew}</span>
                 </label>
                 <label className="toggle-label">
                   <input type="checkbox" checked={showEn} onChange={e => setShowEn(e.target.checked)} />
-                  <span>English</span>
+                  <span>{t.english}</span>
                 </label>
               </div>
 
@@ -107,7 +109,7 @@ export default function TextViewer({ ref_, textData, linksData, loading, onBack,
               ) : text.raw ? (
                 <div className="raw-text">{text.raw}</div>
               ) : (
-                <p className="tv-empty">No text available for this reference.</p>
+                <p className="tv-empty">{t.noText}</p>
               )}
             </div>
           )}
@@ -115,7 +117,7 @@ export default function TextViewer({ ref_, textData, linksData, loading, onBack,
           {activeTab === 'links' && (
             <div className="tv-links-panel">
               {linksList.length === 0 ? (
-                <p className="tv-empty">No commentaries found.</p>
+                <p className="tv-empty">{t.noCommentaries}</p>
               ) : (
                 <div className="links-list">
                   {linksList.map((link, i) => (
