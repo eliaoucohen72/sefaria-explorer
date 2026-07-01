@@ -68,7 +68,7 @@ export default function App() {
               <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
               <button className={lang === 'he' ? 'active' : ''} onClick={() => setLang('he')}>עב</button>
             </div>
-            <DailyPanel />
+            <DailyPanel onSelect={handleSelectRef} />
           </div>
         </div>
       </header>

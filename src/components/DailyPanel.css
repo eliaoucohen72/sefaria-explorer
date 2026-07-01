@@ -65,6 +65,23 @@
   border-bottom: 1px solid var(--border);
 }
 
+.daily-section-clickable {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 8px;
+  margin: -8px;
+  width: calc(100% + 16px);
+  transition: background 0.15s;
+}
+
+.daily-section-clickable:hover {
+  background: var(--accent-light);
+}
+
+.daily-section-clickable:hover .daily-value {
+  color: var(--accent);
+}
+
 .daily-section:last-child {
   border-bottom: none;
   padding-bottom: 0;

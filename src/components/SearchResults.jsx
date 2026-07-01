@@ -154,12 +154,12 @@ export default function SearchResults({ results, onSelect }) {
               <div className="result-group-title">
                 {heTitles[book] ? (
                   isHe ? (
-                    <span><span className="title-primary hebrew">{heTitles[book]}</span> <span className="title-paren">({book})</span></span>
+                    <span><span className="title-primary hebrew">{heTitles[book]}</span> <span className="title-paren" dir="ltr">({book})</span></span>
                   ) : (
-                    <span><span className="title-primary">{book}</span> <span className="title-paren hebrew">({heTitles[book]})</span></span>
+                    <span><span className="title-primary" dir="ltr">{book}</span> <span className="title-paren hebrew">({heTitles[book]})</span></span>
                   )
                 ) : (
-                  <span className="title-primary">{book}</span>
+                  <span className="title-primary" dir="ltr">{book}</span>
                 )}
               </div>
               <span className="result-group-meta">{t.passages(groupItems.length)} {isOpen(book) ? '▲' : '▼'}</span>
@@ -167,7 +167,7 @@ export default function SearchResults({ results, onSelect }) {
             {isOpen(book) && (
               <div className="result-group-items">
                 {groupItems.map((item, i) => (
-                  <ResultCard key={i} item={item} onSelect={onSelect} />
+                  <ResultCard key={i} item={item} onSelect={onSelect} heTitle={heTitles[item.book]} />
                 ))}
               </div>
             )}
@@ -178,20 +178,27 @@ export default function SearchResults({ results, onSelect }) {
   )
 }
 
-function ResultCard({ item, onSelect }) {
+function ResultCard({ item, onSelect, heTitle }) {
   const { isHe } = useLang()
   const ref = item.ref || ''
   const snippet = stripHtml(item.snippet || '')
-  const location = ref.replace(item.book + ', ', '')
+  const location = ref.startsWith(item.book + ', ')
+    ? ref.slice(item.book.length + 2)
+    : ref.startsWith(item.book + ' ')
+      ? ref.slice(item.book.length + 1)
+      : ref
 
   return (
     <button className="result-card" onClick={() => onSelect(ref)}>
-      <div className="result-card-top">
+      <div className="result-card-top" dir={isHebrew(location) ? 'rtl' : 'ltr'}>
         <span className="result-ref">{location}</span>
-        <span className="result-arrow">{isHe ? '←' : '→'}</span>
+        <span className="result-arrow">{isHebrew(location) ? '←' : '→'}</span>
       </div>
       {snippet && (
-        <p className={`result-snippet ${isHebrew(snippet) ? 'hebrew' : ''}`}>
+        <p
+          className={`result-snippet ${isHebrew(snippet) ? 'hebrew' : ''}`}
+          dir={isHebrew(snippet) ? 'rtl' : 'ltr'}
+        >
           {snippet.length > 220 ? snippet.slice(0, 220) + '…' : snippet}
         </p>
       )}

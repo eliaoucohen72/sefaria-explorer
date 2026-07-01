@@ -6,14 +6,20 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 const httpsAgent = new https.Agent({ rejectUnauthorized: false })
 
+function collectJson(res) {
+  return new Promise((resolve, reject) => {
+    const chunks = []
+    res.on('data', chunk => chunks.push(chunk))
+    res.on('end', () => {
+      try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf8'))) } catch (e) { reject(e) }
+    })
+  })
+}
+
 function sefariaFetch(url) {
   return new Promise((resolve, reject) => {
     https.get(url, { agent: httpsAgent }, (res) => {
-      let data = ''
-      res.on('data', chunk => data += chunk)
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)) } catch (e) { reject(e) }
-      })
+      collectJson(res).then(resolve).catch(reject)
     }).on('error', reject)
   })
 }
@@ -28,11 +34,7 @@ function sefariaPost(path, body) {
       agent: httpsAgent,
       headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) }
     }, (res) => {
-      let data = ''
-      res.on('data', chunk => data += chunk)
-      res.on('end', () => {
-        try { resolve(JSON.parse(data)) } catch (e) { reject(e) }
-      })
+      collectJson(res).then(resolve).catch(reject)
     })
     req.on('error', reject)
     req.write(payload)
@@ -92,11 +94,20 @@ app.get('/api/search', async (req, res) => {
 
     const results = hits.map(h => {
       const fullId = h._id
-      const bookTitle = fullId.split(',')[0].trim()
-      // Extract clean ref: between first comma and opening paren
-      // e.g. "Book Title, Section 4:1 (Publisher [he])" → "Book Title, Section 4:1"
       const withoutMeta = fullId.replace(/\s*\([^)]*\)\s*$/, '').trim()
       const ref = withoutMeta
+      // Extract book title: everything before the first section number (digits after a space)
+      // e.g. "Sha'ar HaGilgulim 2:2" → "Sha'ar HaGilgulim"
+      // e.g. "Genesis 1:1" → "Genesis"
+      // Fallback: split on comma if present
+      let bookTitle
+      const commaIdx = withoutMeta.indexOf(', ')
+      if (commaIdx !== -1) {
+        bookTitle = withoutMeta.slice(0, commaIdx).trim()
+      } else {
+        const sectionMatch = withoutMeta.match(/^(.*?)\s+(\d[\d.:abAB]*)$/)
+        bookTitle = sectionMatch ? sectionMatch[1].trim() : withoutMeta
+      }
       const langMatch = fullId.match(/\[(en|he)\]/)
       const lang = langMatch ? (langMatch[1] === 'he' ? 'Hebrew' : 'English') : 'Other'
       const category = guessCategory(bookTitle)
@@ -164,7 +175,8 @@ app.get('/api/links', async (req, res) => {
 
 app.get('/api/parsha', async (req, res) => {
   try {
-    const data = await sefariaFetch('https://www.sefaria.org/api/calendars')
+    const diaspora = req.query.diaspora ?? '0'
+    const data = await sefariaFetch(`https://www.sefaria.org/api/calendars?diaspora=${diaspora}`)
     const parsha = data.calendar_items?.find(item => item.title?.en === 'Parashat Hashavua')
     if (!parsha) return res.status(404).json({ error: 'Parsha not found' })
     res.json({ content: [{ type: 'text', text: JSON.stringify(parsha) }] })
@@ -175,7 +187,8 @@ app.get('/api/parsha', async (req, res) => {
 
 app.get('/api/calendars', async (req, res) => {
   try {
-    const data = await sefariaFetch('https://www.sefaria.org/api/calendars')
+    const diaspora = req.query.diaspora ?? '0'
+    const data = await sefariaFetch(`https://www.sefaria.org/api/calendars?diaspora=${diaspora}`)
     res.json({ content: [{ type: 'text', text: JSON.stringify(data.calendar_items) }] })
   } catch (err) {
     res.status(500).json({ error: err.message })

@@ -12,8 +12,9 @@ function parseContent(data) {
   }
 }
 
-export default function DailyPanel() {
-  const { t } = useLang()
+export default function DailyPanel({ onSelect }) {
+  const { t, lang } = useLang()
+  const isHe = lang === 'he'
   const [open, setOpen] = useState(false)
   const [calendars, setCalendars] = useState(null)
   const [parsha, setParsha] = useState(null)
@@ -53,23 +54,30 @@ export default function DailyPanel() {
           {!loading && (
             <>
               {parsha && (
-                <div className="daily-section">
+                <div
+                  className={`daily-section${parsha.ref && onSelect ? ' daily-section-clickable' : ''}`}
+                  onClick={parsha.ref && onSelect ? () => { onSelect(parsha.ref); setOpen(false) } : undefined}
+                >
                   <div className="daily-label">{t.parashatHashavua}</div>
-                  <div className="daily-value">{parsha.displayValue?.en}</div>
-                  {parsha.displayValue?.he && (
+                  <div className="daily-value">{isHe ? (parsha.displayValue?.he || parsha.displayValue?.en) : parsha.displayValue?.en}</div>
+                  {!isHe && parsha.displayValue?.he && (
                     <div className="daily-value-he hebrew">{parsha.displayValue.he}</div>
                   )}
-                  {parsha.description?.en && (
-                    <div className="daily-desc">{parsha.description.en}</div>
+                  {parsha.description && (
+                    <div className="daily-desc">{isHe ? (parsha.description?.he || parsha.description?.en) : parsha.description?.en}</div>
                   )}
                 </div>
               )}
 
               {calItems.length > 0 && calItems.map((item, i) => (
-                <div key={i} className="daily-section">
-                  <div className="daily-label">{item.title?.en || item.title || item.type || 'Study'}</div>
-                  <div className="daily-value">{item.displayValue?.en || item.ref || item.value || ''}</div>
-                  {item.displayValue?.he && (
+                <div
+                  key={i}
+                  className={`daily-section${item.ref && onSelect ? ' daily-section-clickable' : ''}`}
+                  onClick={item.ref && onSelect ? () => { onSelect(item.ref); setOpen(false) } : undefined}
+                >
+                  <div className="daily-label">{isHe ? (item.title?.he || item.title?.en || item.title || item.type || 'Study') : (item.title?.en || item.title || item.type || 'Study')}</div>
+                  <div className="daily-value">{isHe ? (item.displayValue?.he || item.displayValue?.en || item.ref || item.value || '') : (item.displayValue?.en || item.ref || item.value || '')}</div>
+                  {!isHe && item.displayValue?.he && (
                     <div className="daily-value-he hebrew">{item.displayValue.he}</div>
                   )}
                 </div>
